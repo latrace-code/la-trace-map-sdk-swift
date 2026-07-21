@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.xcuserstate
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+# Build artifacts
+build/
+*.o
+*.a
+*.dylib
+*.so
+
+# Carthage / CocoaPods (not used, but keep ignored just in case)
+Carthage/Build/
+Pods/
+
+# Misc
+*.log
+*.tmp
+
+# xcodegen-generated artifacts inside Examples/
+# The Info.plist is generated from project.yml on every `xcodegen generate`;
+# keep project.yml as the source of truth.
+Examples/**/Info.plist
