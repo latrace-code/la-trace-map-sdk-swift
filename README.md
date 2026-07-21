@@ -42,10 +42,15 @@ Then add `LaTraceMapSDK` as a dependency of your app target.
 ### CocoaPods
 
 ```ruby
-pod 'LaTraceMapSDK', '~> 1.0'
+pod 'LaTraceMapSDK',
+    :git => 'https://github.com/latrace-code/la-trace-map-sdk-swift.git',
+    :tag => '1.0.1'
 ```
 
-The repository is public, so both managers resolve it without authentication.
+The pod is not on the CocoaPods trunk index yet, hence the explicit `:git` /
+`:tag`. It resolves without authentication all the same, since the repository is
+public. Once the pod is published to trunk, `pod 'LaTraceMapSDK', '~> 1.0'` will
+be enough.
 
 ### Runnable example
 
