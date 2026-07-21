@@ -21,19 +21,38 @@ IPA, and you need neither Node nor any JS tooling.
 | `exploreBaseUrl` | Host serving the Explore embed (the front app). Environment-specific, never defaulted by the SDK. |
 | `apiBaseUrl` | API gateway base, serving `/geocode` and `/static-map`. **Not** the Explore host: that one answers its SPA shell on every path. Only needed for the geocoder and the static-map thumbnails. |
 
-## Install via SPM
+## Install
 
-In Xcode: `File > Add Packages...` and use the repository URL.
+### Swift Package Manager
+
+In Xcode: `File > Add Package Dependencies...`, paste the repository URL
+`https://github.com/latrace-code/la-trace-map-sdk-swift.git`, dependency rule
+**Up to Next Major Version** from `1.0.1`, product `LaTraceMapSDK`.
 
 Or in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "0.0.1")
+    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.1")
 ]
 ```
 
 Then add `LaTraceMapSDK` as a dependency of your app target.
+
+### CocoaPods
+
+```ruby
+pod 'LaTraceMapSDK', '~> 1.0'
+```
+
+The repository is public, so both managers resolve it without authentication.
+
+### Runnable example
+
+A minimal UIKit integration lives in
+[`la-trace-map-sdk-example-ios`](https://github.com/latrace-code/la-trace-map-sdk-example-ios):
+clone it, run `xcodegen generate`, fill in your four values, and you have a map
+with your own places.
 
 ## Usage
 
