@@ -27,13 +27,13 @@ IPA, and you need neither Node nor any JS tooling.
 
 In Xcode: `File > Add Package Dependencies...`, paste the repository URL
 `https://github.com/latrace-code/la-trace-map-sdk-swift.git`, dependency rule
-**Up to Next Major Version** from `1.0.2`, product `LaTraceMapSDK`.
+**Up to Next Major Version** from `1.0.3`, product `LaTraceMapSDK`.
 
 Or in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.2")
+    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.3")
 ]
 ```
 
@@ -42,15 +42,11 @@ Then add `LaTraceMapSDK` as a dependency of your app target.
 ### CocoaPods
 
 ```ruby
-pod 'LaTraceMapSDK',
-    :git => 'https://github.com/latrace-code/la-trace-map-sdk-swift.git',
-    :tag => '1.0.2'
+pod 'LaTraceMapSDK', '~> 1.0'
 ```
 
-The pod is not on the CocoaPods trunk index yet, hence the explicit `:git` /
-`:tag`. It resolves without authentication all the same, since the repository is
-public. Once the pod is published to trunk, `pod 'LaTraceMapSDK', '~> 1.0'` will
-be enough.
+Published on the CocoaPods trunk: <https://cocoapods.org/pods/LaTraceMapSDK>.
+Both managers resolve without authentication, the repository being public.
 
 ### Runnable example
 
