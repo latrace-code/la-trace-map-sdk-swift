@@ -370,6 +370,40 @@ final class ExploreApiTests: XCTestCase {
         XCTAssertEqual(results[0].coords, [2.35, 48.85])
         XCTAssertEqual(results[0].label, "Louvre, Paris, France")
         XCTAssertEqual(results[1].label, "Direct Label")
+        XCTAssertEqual(results[0].type, .poi)
+        XCTAssertEqual(results[1].type, .city)
+    }
+
+    func testGeocoderParsesTypeAndBbox() {
+        let json = Data("""
+        {"results":[
+          {"id":"a","label":"Toulouse, France","type":"city","coords":[1.44,43.6],"bbox":[1.35,43.53,1.51,43.67]},
+          {"id":"b","label":"Somewhere","type":"newkind","coords":[1.0,2.0],"bbox":[1.0]}
+        ]}
+        """.utf8)
+        let results = LaTraceGeocoder.parse(json)
+        XCTAssertEqual(results.count, 2)
+        XCTAssertEqual(results[0].bbox, [1.35, 43.53, 1.51, 43.67])
+        XCTAssertNil(results[1].type)
+        XCTAssertNil(results[1].bbox)
+    }
+
+    func testAutocompleteDefaultsMatchWebSearch() {
+        let items = LaTraceGeocoder.queryItems(
+            "  Toulouse ", locale: .fr, limit: 6, types: GeoResultType.searchDefaults, countries: "fr,be"
+        )
+        let byName = Dictionary(uniqueKeysWithValues: (items ?? []).map { ($0.name, $0.value) })
+        XCTAssertEqual(byName["q"], "Toulouse")
+        XCTAssertEqual(byName["lang"], "fr")
+        XCTAssertEqual(byName["limit"], "6")
+        XCTAssertEqual(byName["countries"], "fr,be")
+        XCTAssertEqual(byName["types"], "city,town,village,district,region,country,address,landmark")
+    }
+
+    func testGeocoderQueryItemsEdgeCases() {
+        XCTAssertNil(LaTraceGeocoder.queryItems("   ", locale: nil, limit: 6, types: [], countries: nil))
+        let items = LaTraceGeocoder.queryItems("Gent", locale: nil, limit: nil, types: [], countries: nil) ?? []
+        XCTAssertEqual(items.map(\.name), ["q"])
     }
 }
 #endif

@@ -27,13 +27,13 @@ IPA, and you need neither Node nor any JS tooling.
 
 In Xcode: `File > Add Package Dependencies...`, paste the repository URL
 `https://github.com/latrace-code/la-trace-map-sdk-swift.git`, dependency rule
-**Up to Next Major Version** from `1.0.3`, product `LaTraceMapSDK`.
+**Up to Next Major Version** from `1.0.4`, product `LaTraceMapSDK`.
 
 Or in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.3")
+    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.4")
 ]
 ```
 
@@ -135,9 +135,13 @@ Openings and sessions feed the partner dashboard:
 
 Both live outside the bridge and take `apiBaseUrl` (the gateway, see above):
 
-- `LaTraceGeocoder(apiKey:apiBaseUrl:countries:)` — `autocomplete(_:)` /
-  `geocode(_:)` for your own search bar. Pass `countries` (ISO-2 CSV) or the
-  index answers well outside your territory.
+- `LaTraceGeocoder(apiKey:apiBaseUrl:countries:)` — `autocomplete(_:locale:limit:types:)` /
+  `geocode(_:locale:limit:types:)` for your own search bar. Pass `countries` (ISO-2 CSV) or the
+  index answers well outside your territory. The defaults match the La Trace
+  web search: 6 suggestions, `types` = `GeoResultType.searchDefaults` (places,
+  addresses, landmarks; add `.poi` for businesses). Display the results in the
+  order received, the gateway already ranks them. Each `GeoResult` carries its
+  `type` and, for an area, a `bbox` to fit the camera to.
 - `laTraceStaticMapRequest(…)` — an authenticated `URLRequest` for a
   server-rendered thumbnail, with your own marker colours and logos.
 

@@ -43,27 +43,61 @@ public struct LaTraceGeocoder: Sendable {
         self.session = session
     }
 
-    /// Type-ahead suggestions for a partial query.
-    public func autocomplete(_ q: String, locale: Locale? = nil) async throws -> [GeoResult] {
-        try await search(q, locale: locale, limit: 8)
+    /// Type-ahead suggestions for a partial query. Display them in the order
+    /// received: the gateway already ranks them.
+    ///
+    /// The defaults match the La Trace web search (6 results, places,
+    /// addresses and landmarks).
+    public func autocomplete(
+        _ q: String,
+        locale: Locale? = nil,
+        limit: Int = 6,
+        types: [GeoResultType] = GeoResultType.searchDefaults
+    ) async throws -> [GeoResult] {
+        try await search(q, locale: locale, limit: limit, types: types)
     }
 
-    /// Full forward geocoding for a complete query.
-    public func geocode(_ q: String, locale: Locale? = nil) async throws -> [GeoResult] {
-        try await search(q, locale: locale, limit: nil)
+    /// Full forward geocoding for a complete query. `limit: nil` lets the
+    /// gateway apply its own default (8).
+    public func geocode(
+        _ q: String,
+        locale: Locale? = nil,
+        limit: Int? = nil,
+        types: [GeoResultType] = GeoResultType.searchDefaults
+    ) async throws -> [GeoResult] {
+        try await search(q, locale: locale, limit: limit, types: types)
     }
 
     // MARK: - Private
 
-    private func search(_ q: String, locale: Locale?, limit: Int?) async throws -> [GeoResult] {
+    private func search(_ q: String, locale: Locale?, limit: Int?, types: [GeoResultType]) async throws -> [GeoResult] {
+        guard let items = Self.queryItems(q, locale: locale, limit: limit, types: types, countries: countries) else {
+            return []
+        }
+        let data = try await get(path: "geocode", items: items)
+        return Self.parse(data)
+    }
+
+    /// `nil` for a blank query, which is answered locally without a request.
+    internal static func queryItems(
+        _ q: String,
+        locale: Locale?,
+        limit: Int?,
+        types: [GeoResultType],
+        countries: String?
+    ) -> [URLQueryItem]? {
         let trimmed = q.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return [] }
+        guard !trimmed.isEmpty else { return nil }
         var items = [URLQueryItem(name: "q", value: trimmed)]
         if let locale { items.append(URLQueryItem(name: "lang", value: locale.rawValue)) }
         if let limit { items.append(URLQueryItem(name: "limit", value: String(limit))) }
         if let countries { items.append(URLQueryItem(name: "countries", value: countries)) }
-        let data = try await get(path: "geocode", items: items)
-        return Self.parse(data)
+        // An empty list would mean "nothing"; the gateway reads a missing
+        // `types` as its own default instead.
+        if !types.isEmpty {
+            items.append(URLQueryItem(name: "types", value: types.map(\.rawValue).joined(separator: ",")))
+        }
+        return items
     }
 
     private func get(path: String, items: [URLQueryItem]) async throws -> Data {
@@ -160,10 +194,13 @@ public struct LaTraceGeocoder: Sendable {
                 return nil
             }
             let label = (result["label"] as? String) ?? ""
+            let bbox = (result["bbox"] as? [Double]).flatMap { $0.count == 4 ? $0 : nil }
             return GeoResult(
                 label: label,
                 coords: [coords[0], coords[1]],
-                secondary: result["context"] as? String
+                secondary: result["context"] as? String,
+                type: (result["type"] as? String).flatMap(GeoResultType.init(rawValue:)),
+                bbox: bbox
             )
         }
     }

@@ -1,0 +1,25 @@
+name: Publish pod
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+jobs:
+  trunk-push:
+    name: pod trunk push
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Push to CocoaPods trunk
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+          LANG: en_US.UTF-8
+          LC_ALL: en_US.UTF-8
+        run: pod trunk push LaTraceMapSDK.podspec --allow-warnings
