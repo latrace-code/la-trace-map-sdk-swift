@@ -27,13 +27,13 @@ IPA, and you need neither Node nor any JS tooling.
 
 In Xcode: `File > Add Package Dependencies...`, paste the repository URL
 `https://github.com/latrace-code/la-trace-map-sdk-swift.git`, dependency rule
-**Up to Next Major Version** from `1.0.4`, product `LaTraceMapSDK`.
+**Up to Next Major Version** from `1.0.5`, product `LaTraceMapSDK`.
 
 Or in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.4")
+    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.5")
 ]
 ```
 

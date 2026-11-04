@@ -10,7 +10,8 @@ import Foundation
 ///   distinct `map:idle`; `viewport:change` is the only movement signal).
 /// - ``searchArea(bbox:)`` → host runs its "search this area" query and
 ///   re-pushes the corpus.
-/// - ``externalOpen(poiId:url:)`` → outbound-link tracking.
+/// - ``externalOpen(poiId:url:)`` → outbound link to open, including the
+///   booking button of the preview card (`reservation:click` on the wire).
 /// - ``basemapChange(_:)`` → the basemap moved (host command **or** the
 ///   map's own default at boot); the host realigns its selector.
 /// - ``poisRejected(_:)`` → POIs the embed refused after a push; without it
@@ -50,7 +51,7 @@ public enum LaTraceExploreEvent: Equatable, Sendable {
             guard let wrapper = try? decoder.decode(SearchAreaPayload.self, from: data) else { return nil }
             self = .searchArea(bbox: wrapper.bbox)
 
-        case ExploreEventName.externalOpen:
+        case ExploreEventName.externalOpen, ExploreEventName.reservationClick:
             guard let wrapper = try? decoder.decode(ExternalOpenPayload.self, from: data) else { return nil }
             self = .externalOpen(poiId: wrapper.poiId, url: wrapper.url)
 

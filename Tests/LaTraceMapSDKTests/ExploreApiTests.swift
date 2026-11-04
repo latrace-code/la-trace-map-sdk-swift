@@ -240,6 +240,7 @@ final class ExploreApiTests: XCTestCase {
         bridge.emit(InboundEnvelope(name: "ready", payload: nil))
         bridge.emit(InboundEnvelope(name: "search:area", payload: Data("{\"bbox\":[1,2,3,4]}".utf8)))
         bridge.emit(InboundEnvelope(name: "external:open", payload: Data("{\"poiId\":\"p\",\"url\":\"https://x\"}".utf8)))
+        bridge.emit(InboundEnvelope(name: "reservation:click", payload: Data("{\"poiId\":\"p\",\"url\":\"https://book\"}".utf8)))
         bridge.emit(InboundEnvelope(name: "error", payload: Data("{\"code\":\"E\",\"message\":\"boom\"}".utf8)))
         bridge.emit(InboundEnvelope(name: "unknown:thing", payload: nil))
 
@@ -247,6 +248,7 @@ final class ExploreApiTests: XCTestCase {
             .ready,
             .searchArea(bbox: [1, 2, 3, 4]),
             .externalOpen(poiId: "p", url: "https://x"),
+            .externalOpen(poiId: "p", url: "https://book"),
             .error(code: "E", message: "boom")
         ])
     }

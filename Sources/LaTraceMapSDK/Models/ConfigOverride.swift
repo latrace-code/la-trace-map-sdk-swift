@@ -10,10 +10,16 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
 
     /// Semantic `--lt-*` theme tokens.
     public var theme: [String: String]?
+    /// Host fonts. `headings` styles titles, including the place name of the
+    /// preview card; `url` points at a font file the embed loads.
+    public var fonts: Fonts?
     /// **Single source** of marker colour, keyed by `Poi.category`.
     public var poiColors: [String: PoiColor]?
     /// Custom marker logos, keyed by `poiType` (then `category`).
     public var poiIcons: [String: String]?
+    /// One outline colour (hex, e.g. `"#000000"`) for every marker. `nil` keeps
+    /// the outline of each category (`PoiColor.text`).
+    public var poiBorderColor: String?
     /// Declutter exclusion radius in px, `(0, 200]`.
     public var poiExclusionRadiusPx: Double?
     public var mapNav: MapNavOverride? = nil
@@ -30,16 +36,20 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
 
     public init(
         theme: [String: String]? = nil,
+        fonts: Fonts? = nil,
         poiColors: [String: PoiColor]? = nil,
         poiIcons: [String: String]? = nil,
+        poiBorderColor: String? = nil,
         poiExclusionRadiusPx: Double? = nil,
         mapNav: MapNavOverride? = nil,
         poiDetailMode: PoiDetailMode? = nil,
         locale: Locale? = nil
     ) {
         self.theme = theme
+        self.fonts = fonts
         self.poiColors = poiColors
         self.poiIcons = poiIcons
+        self.poiBorderColor = poiBorderColor
         self.poiExclusionRadiusPx = poiExclusionRadiusPx
         self.mapNav = mapNav
         self.poiDetailMode = poiDetailMode
@@ -57,6 +67,26 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
     }
 
     /// Background / text colour pair for a POI category marker.
+    public struct Fonts: Codable, Equatable, Sendable {
+        public var body: FontDef?
+        public var headings: FontDef?
+
+        public init(body: FontDef? = nil, headings: FontDef? = nil) {
+            self.body = body
+            self.headings = headings
+        }
+    }
+
+    public struct FontDef: Codable, Equatable, Sendable {
+        public var family: String
+        public var url: String?
+
+        public init(family: String, url: String? = nil) {
+            self.family = family
+            self.url = url
+        }
+    }
+
     public struct PoiColor: Codable, Equatable, Sendable {
         public var background: String
         public var text: String

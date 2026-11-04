@@ -71,6 +71,7 @@ internal enum ExploreEventName {
     static let viewportChange = "viewport:change"
     static let searchArea = "search:area"
     static let externalOpen = "external:open"
+    static let reservationClick = "reservation:click"
     static let basemapChange = "basemap:change"
     static let poisRejected = "pois:rejected"
     static let error = "error"

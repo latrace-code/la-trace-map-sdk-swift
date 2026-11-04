@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'LaTraceMapSDK'
-  s.version          = '1.0.4'
+  s.version          = '1.0.5'
   s.summary          = 'SDK carto La Trace pour iOS : le vrai /explore pilote depuis Swift.'
 
   s.description      = <<~DESC
