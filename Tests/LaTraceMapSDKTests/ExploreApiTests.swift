@@ -337,6 +337,33 @@ final class ExploreApiTests: XCTestCase {
         XCTAssertEqual(items["prewarm"], "1")
     }
 
+    func testExploreEmbedURLCarriesInitialCamera() throws {
+        func items(_ view: CameraTarget?) throws -> [String: String?] {
+            let url = exploreEmbedURL(options: LaTraceExploreOptions(
+                apiKey: "pk_live_x",
+                configId: "cfg-1",
+                exploreBaseUrl: URL(string: "https://preview.example.app")!,
+                initialView: view
+            ))
+            let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
+            return Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).map { ($0.name, $0.value) })
+        }
+
+        let full = try items(CameraTarget(center: [2.35, 48.85], zoom: 12.5))
+        XCTAssertEqual(full["center"], "2.35,48.85")
+        XCTAssertEqual(full["zoom"], "12.5")
+
+        let centerOnly = try items(CameraTarget(center: [-1.5, 47.2], zoom: Double.nan))
+        XCTAssertEqual(centerOnly["center"], "-1.5,47.2")
+        XCTAssertNil(centerOnly["zoom"])
+
+        let invalid = try items(CameraTarget(center: [Double.infinity, 48.85], zoom: 12))
+        XCTAssertNil(invalid["center"])
+        XCTAssertNil(invalid["zoom"])
+
+        XCTAssertNil(try items(nil)["center"])
+    }
+
     func testExploreEmbedURLNeverDoublesExploreSegment() throws {
         // Base without a trailing /explore: exactly one segment appended.
         let withoutSuffix = exploreEmbedURL(options: LaTraceExploreOptions(

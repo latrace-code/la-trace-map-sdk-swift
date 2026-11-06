@@ -4,14 +4,15 @@ import Foundation
 ///
 /// The map loads `{exploreBaseUrl}/explore?sdkBridge=1&ui=bare&transport=native&customConfigId=…&apiKey=…`
 /// (see ``exploreEmbedURL(options:)``). `initial*` values are queued as
-/// commands and applied as soon as the embed reports `ready`.
+/// commands and applied as soon as the embed reports `ready`; `initialView`
+/// also travels in the URL (`center`, `zoom`) so the embed boots on it.
 public struct LaTraceExploreOptions: Equatable, Sendable {
 
     /// Dedicated native key (`pk_live_*`). The barrier is key + quota
     /// (embedder Origin is not reliable natively), so the key must be
     /// provisioned with `allowedOrigins: ["*"]`: a native client sends no
     /// `Origin`, and an origin-scoped key is refused (403 `origin_not_allowed`)
-    /// on ``LaTraceGeocoder`` and ``laTraceStaticMapRequest(configId:apiKey:apiBaseUrl:center:zoom:size:scale:pois:poiColors:poiIcons:)``.
+    /// on ``LaTraceGeocoder`` and ``laTraceStaticMapRequest(configId:apiKey:apiBaseUrl:center:zoom:size:scale:pois:poiColors:poiIcons:poiBorderColor:)``.
     public var apiKey: String
 
     /// Base config id + stats key (session / clientMap id).
@@ -90,6 +91,15 @@ public func exploreEmbedURL(options: LaTraceExploreOptions) -> URL {
     }
     if options.prewarm {
         items.append(URLQueryItem(name: "prewarm", value: "1"))
+    }
+    // The embed boots on this camera instead of its default one, the `flyTo`
+    // replayed on `ready` would otherwise land seconds later.
+    if let view = options.initialView,
+       view.center.count == 2, view.center[0].isFinite, view.center[1].isFinite {
+        items.append(URLQueryItem(name: "center", value: "\(view.center[0]),\(view.center[1])"))
+        if let zoom = view.zoom, zoom.isFinite {
+            items.append(URLQueryItem(name: "zoom", value: String(zoom)))
+        }
     }
     // Preserve any query already present on a custom base URL.
     components.queryItems = (components.queryItems ?? []) + items

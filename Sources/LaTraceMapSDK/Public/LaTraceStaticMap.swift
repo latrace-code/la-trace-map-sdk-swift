@@ -25,9 +25,13 @@ public let laTraceStaticMapMaxDimension = 1280
 /// - `poiColors` is the host's marker palette, the same `[category: PoiColor]`
 ///   map the interactive map takes via ``ConfigOverride/poiColors``. A POI whose
 ///   category has no entry falls back to the La Trace colour — colours are keyed
-///   by category only, there is no `poiType` key for them.
+///   by category only, there is no `poiType` key for them. Categories match
+///   trimmed and case-insensitively, like on the interactive map.
 /// - `poiIcons` is the same `[key: url]` map as ``ConfigOverride/poiIcons``,
-///   resolved with the same precedence (`poiType` first, then `category`).
+///   resolved with the same precedence (`poiType` exactly first, then
+///   `category` trimmed and case-insensitively).
+/// - `poiBorderColor` is ``ConfigOverride/poiBorderColor``: one outline colour
+///   for every marker, `nil` keeps the outline of each category.
 ///
 /// Returns `nil` when `center` is not a usable `[lng, lat]`.
 public func laTraceStaticMapRequest(
@@ -40,7 +44,8 @@ public func laTraceStaticMapRequest(
     scale: Int = 2,
     pois: [Poi],
     poiColors: [String: ConfigOverride.PoiColor] = [:],
-    poiIcons: [String: String] = [:]
+    poiIcons: [String: String] = [:],
+    poiBorderColor: String? = nil
 ) -> URLRequest? {
     guard center.count == 2, center[0].isFinite, center[1].isFinite else { return nil }
 
@@ -55,11 +60,29 @@ public func laTraceStaticMapRequest(
         URLQueryItem(name: "height", value: String(staticMapDimension(size.height))),
         URLQueryItem(name: "scale", value: scale == 2 ? "2" : "1")
     ]
+    let colorsByCategory = Dictionary(
+        poiColors.map { (categoryKey($0.key), $0.value) },
+        uniquingKeysWith: { first, _ in first }
+    )
+    let iconsByCategory = Dictionary(
+        poiIcons.map { (categoryKey($0.key), $0.value) },
+        uniquingKeysWith: { first, _ in first }
+    )
     let markers = pois
-        .compactMap { staticMapMarker($0, poiColors: poiColors, poiIcons: poiIcons) }
+        .compactMap {
+            staticMapMarker(
+                $0,
+                poiColors: colorsByCategory,
+                poiIcons: poiIcons,
+                poiIconsByCategory: iconsByCategory
+            )
+        }
         .prefix(laTraceStaticMapMaxMarkers)
     if !markers.isEmpty {
         items.append(URLQueryItem(name: "markers", value: markers.joined(separator: ";")))
+    }
+    if let poiBorderColor, !poiBorderColor.isEmpty {
+        items.append(URLQueryItem(name: "border", value: bareHex(poiBorderColor)))
     }
     components.queryItems = items
 
@@ -74,20 +97,22 @@ public func laTraceStaticMapRequest(
 private func staticMapMarker(
     _ poi: Poi,
     poiColors: [String: ConfigOverride.PoiColor],
-    poiIcons: [String: String]
+    poiIcons: [String: String],
+    poiIconsByCategory: [String: String]
 ) -> String? {
     guard poi.coords.count == 2, poi.coords[0].isFinite, poi.coords[1].isFinite else { return nil }
+    let category = categoryKey(poi.category)
     // `color` = `body-disc`: the drop (= PoiColor.text, the colour read at a
     // distance) then the puck under the glyph (= PoiColor.background). Bare hex,
     // no `#`: it would have to travel percent-encoded.
-    let color = poiColors[poi.category].map { "\(bareHex($0.text))-\(bareHex($0.background))" } ?? ""
+    let color = poiColors[category].map { "\(bareHex($0.text))-\(bareHex($0.background))" } ?? ""
     // Same precedence as the interactive map (`poiType` then `category`): a type
     // key is the only way to tell two types of one category apart, and resolving
     // by category alone left the thumbnail on the La Trace glyph while the map
     // showed the host's logo. Each candidate is filtered on its own, so an
     // unusable type icon still falls back to the category one.
     let icon = staticMapIcon(poi.poiType.flatMap { poiIcons[$0] })
-        ?? staticMapIcon(poiIcons[poi.category])
+        ?? staticMapIcon(poiIconsByCategory[category])
         ?? ""
     var fields = ["\(poi.coords[0])", "\(poi.coords[1])", poi.poiType ?? "", color, icon]
     while let last = fields.last, last.isEmpty { fields.removeLast() }
@@ -100,6 +125,10 @@ private func staticMapMarker(
 private func staticMapIcon(_ url: String?) -> String? {
     guard let url, url.hasPrefix("https://"), !url.contains(";") else { return nil }
     return url
+}
+
+private func categoryKey(_ value: String) -> String {
+    value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 }
 
 private func bareHex(_ value: String) -> String {
