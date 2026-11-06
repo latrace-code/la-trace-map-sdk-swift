@@ -27,13 +27,13 @@ IPA, and you need neither Node nor any JS tooling.
 
 In Xcode: `File > Add Package Dependencies...`, paste the repository URL
 `https://github.com/latrace-code/la-trace-map-sdk-swift.git`, dependency rule
-**Up to Next Major Version** from `1.0.5`, product `LaTraceMapSDK`.
+**Up to Next Major Version** from `1.0.6`, product `LaTraceMapSDK`.
 
 Or in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.5")
+    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.6")
 ]
 ```
 
@@ -109,7 +109,7 @@ Everything goes through `LaTraceExploreMap` (`mapView.map`):
 | | |
 | --- | --- |
 | Corpus | `setPois(_:)` and `addPois(_:)` return a `PushResult` listing what was refused client-side; `clearPois()` returns nothing. |
-| Camera | `flyTo(_:options:)`, `fitBounds(_:padding:)`, `setCenter(_:)`. |
+| Camera | `flyTo(_:options:)`, `fitBounds(_:padding:)`, `setCenter(_:)`. A camera known up front goes in `LaTraceExploreOptions.initialView`: it travels in the embed URL (`center`, `zoom`), so the map boots on it instead of its default view. |
 | Selection | `highlightPin(_:)` — visual only, `nil` clears it. |
 | Look | `setConfigOverride(_:)` (`poiColors` per category, `poiIcons` per `poiType` then category, declutter radius), `setBasemap(_:)`. |
 | Language | `setLocale(_:)` — re-resolves the whole pushed corpus, not just the chrome. |
@@ -143,7 +143,10 @@ Both live outside the bridge and take `apiBaseUrl` (the gateway, see above):
   order received, the gateway already ranks them. Each `GeoResult` carries its
   `type` and, for an area, a `bbox` to fit the camera to.
 - `laTraceStaticMapRequest(…)` — an authenticated `URLRequest` for a
-  server-rendered thumbnail, with your own marker colours and logos.
+  server-rendered thumbnail, with your own marker colours and logos. It takes
+  the same `poiColors`, `poiIcons` and `poiBorderColor` as `ConfigOverride`,
+  resolved the same way (categories trimmed and case-insensitive), so one
+  config draws the same pins on the map and on the thumbnail.
 
 ## Contract
 
