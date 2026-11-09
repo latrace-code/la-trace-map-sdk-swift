@@ -9,5 +9,5 @@ import Foundation
 public enum LaTraceMapSDKInfo {
     /// The current SDK version. It also pins the revision of the SDK API
     /// contract this package implements. Bumped by `scripts/release.sh`.
-    public static let version = "1.0.6"
+    public static let version = "1.0.7"
 }
