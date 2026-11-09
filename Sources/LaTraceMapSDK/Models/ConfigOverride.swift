@@ -29,6 +29,9 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
     /// it cannot see, and `externalPreview` stacks the embed's own bottom sheet under
     /// the host's card (that preview is content, so the bare chrome does not hide it).
     public var poiDetailMode: PoiDetailMode?
+    /// Camera moves the embed makes on its own, each one switchable alone. A host
+    /// that drives the camera itself (`flyTo` at any time) turns them off.
+    public var camera: Camera?
     /// Stores the active locale, but does **not** re-translate the chrome nor
     /// the corpus already pushed: use ``LaTraceExploreMap/setLocale(_:)`` to
     /// switch language.
@@ -43,6 +46,7 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
         poiExclusionRadiusPx: Double? = nil,
         mapNav: MapNavOverride? = nil,
         poiDetailMode: PoiDetailMode? = nil,
+        camera: Camera? = nil,
         locale: Locale? = nil
     ) {
         self.theme = theme
@@ -53,6 +57,7 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
         self.poiExclusionRadiusPx = poiExclusionRadiusPx
         self.mapNav = mapNav
         self.poiDetailMode = poiDetailMode
+        self.camera = camera
         self.locale = locale
     }
 
@@ -60,13 +65,32 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
     public enum PoiDetailMode: String, Codable, Equatable, Sendable {
         case panel
         case externalPreview
-        /// The embed renders NO detail UI at all: it only recentres and emits
-        /// `pin:click`. What a native host wants, since its own card would
+        /// The embed renders NO detail UI at all: it only recentres (unless
+        /// `Camera.recenterOnPoiClick` is `false`) and emits `pin:click`. What a native host wants, since its own card would
         /// otherwise sit on top of the embed's preview sheet.
         case hostHandled = "none"
     }
 
-    /// Background / text colour pair for a POI category marker.
+    /// Automatic camera moves of the embed. `nil` keeps the move (default `true`).
+    public struct Camera: Codable, Equatable, Sendable {
+        /// Frame the first pushed corpus. Off: the map stays on `initialView`.
+        public var fitInitialCorpus: Bool?
+        /// Frame the matches after a submitted search.
+        public var fitSearchResults: Bool?
+        /// Recentre on a tapped pin.
+        public var recenterOnPoiClick: Bool?
+
+        public init(
+            fitInitialCorpus: Bool? = nil,
+            fitSearchResults: Bool? = nil,
+            recenterOnPoiClick: Bool? = nil
+        ) {
+            self.fitInitialCorpus = fitInitialCorpus
+            self.fitSearchResults = fitSearchResults
+            self.recenterOnPoiClick = recenterOnPoiClick
+        }
+    }
+
     public struct Fonts: Codable, Equatable, Sendable {
         public var body: FontDef?
         public var headings: FontDef?

@@ -110,6 +110,7 @@ Everything goes through `LaTraceExploreMap` (`mapView.map`):
 | --- | --- |
 | Corpus | `setPois(_:)` and `addPois(_:)` return a `PushResult` listing what was refused client-side; `clearPois()` returns nothing. |
 | Camera | `flyTo(_:options:)`, `fitBounds(_:padding:)`, `setCenter(_:)`. A camera known up front goes in `LaTraceExploreOptions.initialView`: it travels in the embed URL (`center`, `zoom`), so the map boots on it instead of its default view. |
+| Host-driven camera | The embed frames the first corpus, frames search matches and recentres on a tapped pin. Each move switches off alone: `setConfigOverride(ConfigOverride(camera: .init(fitInitialCorpus: false, fitSearchResults: false, recenterOnPoiClick: false)))`. |
 | Selection | `highlightPin(_:)` — visual only, `nil` clears it. |
 | Look | `setConfigOverride(_:)` (`poiColors` per category, `poiIcons` per `poiType` then category, declutter radius), `setBasemap(_:)`. |
 | Language | `setLocale(_:)` — re-resolves the whole pushed corpus, not just the chrome. |
