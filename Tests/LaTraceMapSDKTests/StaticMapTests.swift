@@ -9,7 +9,8 @@ final class StaticMapTests: XCTestCase {
         pois: [Poi],
         poiColors: [String: ConfigOverride.PoiColor] = [:],
         poiIcons: [String: String] = [:],
-        poiBorderColor: String? = nil
+        poiBorderColor: String? = nil,
+        poiBorderWidth: Double? = nil
     ) throws -> [String: String?] {
         let request = try XCTUnwrap(laTraceStaticMapRequest(
             configId: "cfg-1",
@@ -21,7 +22,8 @@ final class StaticMapTests: XCTestCase {
             pois: pois,
             poiColors: poiColors,
             poiIcons: poiIcons,
-            poiBorderColor: poiBorderColor
+            poiBorderColor: poiBorderColor,
+            poiBorderWidth: poiBorderWidth
         ))
         let url = try XCTUnwrap(request.url)
         let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
@@ -59,6 +61,13 @@ final class StaticMapTests: XCTestCase {
 
         let withoutBorder = try queryItems(pois: [poi(category: "restaurant")])
         XCTAssertNil(withoutBorder["border"])
+    }
+
+    func testBorderWidthTravelsOnlyWhenUsable() throws {
+        XCTAssertEqual(try queryItems(pois: [], poiBorderWidth: 1)["borderWidth"], "1.0")
+        XCTAssertNil(try queryItems(pois: [])["borderWidth"])
+        XCTAssertNil(try queryItems(pois: [], poiBorderWidth: -1)["borderWidth"])
+        XCTAssertNil(try queryItems(pois: [], poiBorderWidth: .nan)["borderWidth"])
     }
 }
 #endif

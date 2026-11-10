@@ -27,13 +27,13 @@ IPA, and you need neither Node nor any JS tooling.
 
 In Xcode: `File > Add Package Dependencies...`, paste the repository URL
 `https://github.com/latrace-code/la-trace-map-sdk-swift.git`, dependency rule
-**Up to Next Major Version** from `1.0.7`, product `LaTraceMapSDK`.
+**Up to Next Major Version** from `1.0.8`, product `LaTraceMapSDK`.
 
 Or in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.7")
+    .package(url: "https://github.com/latrace-code/la-trace-map-sdk-swift.git", from: "1.0.8")
 ]
 ```
 
@@ -145,7 +145,7 @@ Both live outside the bridge and take `apiBaseUrl` (the gateway, see above):
   `type` and, for an area, a `bbox` to fit the camera to.
 - `laTraceStaticMapRequest(…)` — an authenticated `URLRequest` for a
   server-rendered thumbnail, with your own marker colours and logos. It takes
-  the same `poiColors`, `poiIcons` and `poiBorderColor` as `ConfigOverride`,
+  the same `poiColors`, `poiIcons`, `poiBorderColor` and `poiBorderWidth` as `ConfigOverride`,
   resolved the same way (categories trimmed and case-insensitive), so one
   config draws the same pins on the map and on the thumbnail.
 
