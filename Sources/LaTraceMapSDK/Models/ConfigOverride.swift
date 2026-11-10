@@ -20,6 +20,9 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
     /// One outline colour (hex, e.g. `"#000000"`) for every marker. `nil` keeps
     /// the outline of each category (`PoiColor.text`).
     public var poiBorderColor: String?
+    /// Thickness of that outline in px, on a 30 px wide pin, `[0, 6]`. `nil` keeps
+    /// the original outline (about 2.4 px).
+    public var poiBorderWidth: Double?
     /// Declutter exclusion radius in px, `(0, 200]`.
     public var poiExclusionRadiusPx: Double?
     public var mapNav: MapNavOverride? = nil
@@ -43,6 +46,7 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
         poiColors: [String: PoiColor]? = nil,
         poiIcons: [String: String]? = nil,
         poiBorderColor: String? = nil,
+        poiBorderWidth: Double? = nil,
         poiExclusionRadiusPx: Double? = nil,
         mapNav: MapNavOverride? = nil,
         poiDetailMode: PoiDetailMode? = nil,
@@ -54,6 +58,7 @@ public struct ConfigOverride: Codable, Equatable, Sendable {
         self.poiColors = poiColors
         self.poiIcons = poiIcons
         self.poiBorderColor = poiBorderColor
+        self.poiBorderWidth = poiBorderWidth
         self.poiExclusionRadiusPx = poiExclusionRadiusPx
         self.mapNav = mapNav
         self.poiDetailMode = poiDetailMode

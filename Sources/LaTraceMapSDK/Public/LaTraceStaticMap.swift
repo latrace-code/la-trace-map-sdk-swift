@@ -32,6 +32,8 @@ public let laTraceStaticMapMaxDimension = 1280
 ///   `category` trimmed and case-insensitively).
 /// - `poiBorderColor` is ``ConfigOverride/poiBorderColor``: one outline colour
 ///   for every marker, `nil` keeps the outline of each category.
+/// - `poiBorderWidth` is ``ConfigOverride/poiBorderWidth``: the outline
+///   thickness in px, `nil` keeps the original one.
 ///
 /// Returns `nil` when `center` is not a usable `[lng, lat]`.
 public func laTraceStaticMapRequest(
@@ -45,7 +47,8 @@ public func laTraceStaticMapRequest(
     pois: [Poi],
     poiColors: [String: ConfigOverride.PoiColor] = [:],
     poiIcons: [String: String] = [:],
-    poiBorderColor: String? = nil
+    poiBorderColor: String? = nil,
+    poiBorderWidth: Double? = nil
 ) -> URLRequest? {
     guard center.count == 2, center[0].isFinite, center[1].isFinite else { return nil }
 
@@ -83,6 +86,9 @@ public func laTraceStaticMapRequest(
     }
     if let poiBorderColor, !poiBorderColor.isEmpty {
         items.append(URLQueryItem(name: "border", value: bareHex(poiBorderColor)))
+    }
+    if let poiBorderWidth, poiBorderWidth.isFinite, poiBorderWidth >= 0 {
+        items.append(URLQueryItem(name: "borderWidth", value: String(poiBorderWidth)))
     }
     components.queryItems = items
 
